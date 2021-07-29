@@ -7,6 +7,7 @@
 #define MIN 1000//valor mínimo de n
 #define PASSO 100//tamanho do passo
 #define RMAX 2000//valor máximo que pode ser sorteado
+#define MED 5//o tempo de ordenacao do vetor eh contado 5 vezes
 //lista encadeada
 typedef struct no{
         int n;
@@ -29,6 +30,13 @@ No* criaLista(No* l,int tam,int seed){
     srand(seed);
     for(int i=0;i<tam;i++){
       l=insereNo(l,rand()%(RMAX+1)); 
+    }
+    return l;
+}
+No* criaListaTipo2(No* l,int tam,int seed){  
+    srand(seed);
+    for(int i=0;i<tam;i++){
+      l=insereNo(l,rand()%((tam*tam)+1)); 
     }
     return l;
 }
@@ -87,36 +95,49 @@ void imprimeTxtaux(No *l,char *nome, int tam){
     imprimeTxt(l,f);
     fclose(f);   
 }
-void geraArq(char*nome,char*aux,char* parte,char* graf){
+void geraArq(char*nome,char*aux,char* parte,char* graf,char*graf2){
     No* lista=NULL;
     double total=0;
     int tam;
     FILE *f;
+    int cont=0;
     int arraySeeds[] = {2000, 566, 30610, 134, 2001};
-    for (int j = 0; j <= (MAX-MIN)/PASSO; j++)
-    {
-        for (int i = 0; i < 5; i++)
-        {   tam=MIN+j*PASSO;
-            lista=criaLista(lista,tam,arraySeeds[i]);
-            strcpy(aux,nome);
-            sprintf(parte,"%d",j+i);
-            imprimeTxtaux(lista,strcat(aux,parte),tam);
-            total+=guardaTempo(lista,tam);
-            libera(lista);
-            lista=NULL;
+    for(int z=0; z<2;z++){
+        for (int j = 0; j <= (MAX-MIN)/PASSO; j++)
+        {
+            for (int i = 0; i < MED; i++)
+            {   tam=MIN+j*PASSO;
+                if(z==0)lista=criaLista(lista,tam,arraySeeds[i]);
+                else lista=criaListaTipo2(lista,tam,arraySeeds[i]);
+                strcpy(aux,nome);
+                sprintf(parte,"%d",cont);
+                imprimeTxtaux(lista,strcat(aux,parte),tam);
+                total+=guardaTempo(lista,tam);
+                libera(lista);
+                lista=NULL;
+                printf ("%d\n",cont);
+                cont++;
+            }
+            if(z==0){
+                f = fopen(graf, "a");
+                fprintf (f,"%d  %f\n",tam,total/MED);
+                fclose(f);
+            }
+            else{
+                f = fopen(graf2, "a");
+                fprintf (f,"%d  %f\n",tam,total/MED);
+                fclose(f);
+            }
+            total=0;
         }
-        printf ("%d\n",j);
-        f = fopen(graf, "a");
-        fprintf (f,"%d  %f\n",tam,total/5);
-        fclose(f);
-        total=0;
     }
 }
 int main (){
     char nome[15]="bubble";
     char nomegraf[20]="bubbleTime";
+    char nomegraf2[20]="bubbleTime2";
     char parte[50];
     char aux[50];
-    geraArq(nome,aux,parte,nomegraf);
+    geraArq(nome,aux,parte,nomegraf,nomegraf2);
     return 0;
 }
