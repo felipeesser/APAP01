@@ -73,6 +73,7 @@ void bubble(No *l,int tam){
         aux=l; 
     }
 }
+//medicao do tempo
 double guardaTempo(No *l,int tam){
     double s_CPU_inicial,s_CPU_final,s_total_inicial,s_total_final;
     Tempo_CPU_Sistema(&s_CPU_inicial, &s_total_inicial);
@@ -81,7 +82,7 @@ double guardaTempo(No *l,int tam){
     return s_CPU_final - s_CPU_inicial;
 }
 //arquivo
-void imprimeTxt(No *l,FILE *f){
+void imprimeTxt(No *l,FILE *f){//gera o registro das listas
     if (l)
     {   No* temp=l->prox;
         fprintf(f,"%d\n",l->n);
@@ -118,6 +119,7 @@ void geraArq(char*nome,char*aux,char* parte,char* graf,char*graf2){
                 printf ("%d\n",cont);
                 cont++;
             }
+            //gera o registro dos tempos 
             if(z==0){
                 f = fopen(graf, "a");
                 fprintf (f,"%d  %f\n",tam,total/MED);
